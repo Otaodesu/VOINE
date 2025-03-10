@@ -43,7 +43,7 @@
   - [ ] `voicevox_vvm-main/vvms` の中身すべてを `voine/assets/model` にコピー
 
 ### 4. voicevox_flutterを紐づける
-  - [ ] `zunda_on_the_roid_mercury/pubspec.yaml`を開き、以下の部分を `voicevox_flutter-main` のフォルダパスに書き換えてください
+  - [ ] `voine/pubspec.yaml`を開き、以下の部分を `voicevox_flutter-main` のフォルダパスに書き換えてください
 
 ```yaml
   voicevox_flutter:  
@@ -54,4 +54,4 @@
 ### 5. 依存関係を解決する
   - [ ] `voine/` に移動して、`flutter pub get` を行います
 
-以上でapkファイルがビルドできるようになるはずです！おつかれさまでした！
+これでapkファイルがビルドできるようになるはずです！おつかれさまでした！
