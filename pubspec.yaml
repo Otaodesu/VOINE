@@ -84,7 +84,6 @@ flutter:
     - assets/styleIdToModelName.json
     - assets/open_jtalk_dic_utf_8-1.11/
     - assets/model/
-    - assets/libvoicevox_onnxruntime.so
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

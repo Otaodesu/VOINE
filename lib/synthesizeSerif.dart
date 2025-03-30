@@ -3,17 +3,17 @@ import 'dart:convert';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'service.dart';
 import 'text_dictionary_editor.dart';
+import 'voicevox_controller.dart';
 
 class LunarSpecSynthesizer {
   LunarSpecSynthesizer() {
     _initialize();
   }
 
-  final service = NativeVoiceService();
+  final _voicevox = VoicevoxFlutterController();
   late AudioHandler _audioHandler;
-  bool isFirstPlay = true; // 起動後初回だけ.playするためのフラグ
+  bool isFirstPlay = true; // 起動後初回だけ.playするため
 
   /// 音声合成済みキャッシュから再生する関数。できたらtrueを返す
   Future<bool> _playFromCache(Map<String, dynamic> query, String textForDisplay) async {
@@ -23,11 +23,7 @@ class LunarSpecSynthesizer {
       return false; // キャッシュが存在しなかったのでfalse
     }
 
-    await _audioHandler.addQueueItem(MediaItem(
-      id: wavCache.path,
-      title: textForDisplay,
-      album: '音声合成中プレイリスト',
-    ));
+    await _audioHandler.addQueueItem(MediaItem(id: wavCache.path, title: textForDisplay, album: '音声合成中プレイリスト'));
 
     if (isFirstPlay) {
       await _audioHandler.play();
@@ -38,16 +34,10 @@ class LunarSpecSynthesizer {
   }
 
   /// 😆音声合成を行う主役のメソッド。AudioQueryを返す.
-  Future<Map<String, dynamic>> synthesizeFromText({
-    required String text,
-    required int speakerId,
-  }) async {
+  Future<Map<String, dynamic>> synthesizeFromText({required String text, required int speakerId}) async {
     final serif = await convertTextToSerif(text); // 読み方辞書を適用する.
 
-    while (!service.isReady) {
-      await Future.delayed(const Duration(seconds: 1));
-    }
-    final queryAsString = await service.audioQuery(serif, speakerId); // AudioQueryを生成してもらう
+    final queryAsString = await _voicevox.textToAudioQuery(text: serif, styleId: speakerId); // AudioQueryを生成してもらう
 
     final Map<String, dynamic> audioQuery = jsonDecode(queryAsString);
 
@@ -56,7 +46,7 @@ class LunarSpecSynthesizer {
       return audioQuery; // キャッシュから再生できたようなのでここで完了
     }
 
-    await service.synthesis(queryAsString, speakerId); // 音声を生成してキャッシュに保存してもらう
+    await _voicevox.audioQueryToWav(audioQuery: queryAsString, styleId: speakerId); // 音声を生成してキャッシュに保存してもらう
     // ↕️時間経過あり
     await _playFromCache(audioQuery, text);
     return audioQuery;
@@ -73,10 +63,7 @@ class LunarSpecSynthesizer {
       return; // キャッシュから再生できたようなのでここで完了
     }
 
-    while (!service.isReady) {
-      await Future.delayed(const Duration(seconds: 1));
-    }
-    await service.synthesis(jsonEncode(query), speakerId); // 音声を生成してキャッシュに保存してもらう
+    await _voicevox.audioQueryToWav(audioQuery: jsonEncode(query), styleId: speakerId); // 音声を生成してキャッシュに保存してもらう
     // ↕️時間経過あり
     await _playFromCache(query, textForDisplay);
   }
@@ -85,28 +72,23 @@ class LunarSpecSynthesizer {
     _audioHandler = await AudioService.init(
       builder: () => _MyAudioHandler(),
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.example.zunda_on_the_roid_mercury.channel.audioForSynthesizer',
+        androidNotificationChannelId: 'com.example.voine.channel.audioForSynthesizer',
         androidNotificationChannelName: '音声合成中プレイリストの操作パネル',
         androidNotificationOngoing: true,
       ),
     );
 
     print('${DateTime.now()}😋NativeVoiceServiceを起動します…');
-    await service.initialize(); // voicevox_flutterを起動する
+    await _voicevox.initialize(); // voicevox_flutterを起動する
     print('${DateTime.now()}🥰NativeVoiceServiceが起動しました！');
   }
 }
 // （下ほど新しいコメント）.
-// 読み方辞書機能によって安定性低下の要因である英単語のスペル読みが解消（できるようになった）。じゃんじゃん登録しよう！！.
-// クラス化すればプレイリストが空になってもplayerオブジェクトはクラス変数として保持されているので好きなタイミングでプレイリストに追加すれば再生される！Streamなんていらんかったんや！.
 // .setAudioSourceするとその都度[0]から再生になる（?付き引数になっている）.
 // プレイリストが空のとき.playするとプレイリストに追加されるまで待つモードになる。アプリの外からは再生中として扱われるので待ちかねてYouTube見始めると追加しても鳴り始めない.
-// ユーザーが入力したものは「テキスト」、音声合成に最適化したものは「セリフ」。辞書機能の追加時とか[いつ？]区別しやすくなる。…つもりがもうごっちゃです.
+// ユーザーが入力したものは「テキスト」、音声合成に最適化したものは「セリフ」。…もうごっちゃです.
 // 読み方辞書を用いたテキスト→セリフ変換をこっちに持ってきた。辞書の変更がリアルタイムに反映されるようになるが流用性は薄れる.
-// voicevox_flutterを導入！ストレージ2GB、RAM2.5GBを消費する最強アプリとなった。mercuryどころかjupiter.
 // MeteorSpecSynthesizer. 語感のカッコよさだけで命名
-// service = NativeVoiceService()のくだり、voicevox_flutterサンプルではmainに入っていたがここに置いてみた。マルチスレッド関連の理由がある可能性大だが…
-// cpuNumThreadsと同時オーダー数の組み合わせは結局デフォのcpuNumThreads: 4、同時オーダーなしがベター。同時2オーダーで2.5%速くなったけども
 // 推奨環境はSnapdragon865、RAM6GB。長文の分割合成時にかろうじて追いつかずに生成できる
 // service.dartを改造して、モデルを必要になったタイミングでRAMにロードするようにした。生成中2.5GBが1.2GBまで軽量化！
 
@@ -128,10 +110,12 @@ class LunarSpecSynthesizer {
 // これらパターンのうち、クエリがあるかはmain側で分岐、キャッシュから再生するかはこのクラス側で分岐するようにしてみた。
 // 読み方辞書の変更を反映したいときは《話者を変更する》で一応できるはず…🫠
 
+// ひさびさにこのアプリを引っ張り出すも当然のようにFlutterの破壊的変更でビルドできず。空のサンプルアプリから作り直してたらなんとVOICEVOX Core 0.16.0にAndroid向けビルドが出てるのを発見！
+// voicevox_flutterを改造して、ついに ずんだもん（へろへろ） に対応できた！
+
 //
 // ついにaudio_serviceを導入し、通知バーから一時停止/スキップを行えるようにした
 // https://github.com/suragch/flutter_audio_service_demo/blob/master/final/lib/services/audio_handler.dart (8ae2d18) より。まるごと引っ張ってきた
-// TODO: android\app\src\main\AndroidManifest.xmlも変更したのでGitHubアップ時同期する
 class _MyAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer(); // just_audioをラッピングして動作を監視することでOSとの連携が可能になる…という解釈…？
   final _playlist = ConcatenatingAudioSource(children: []);
@@ -154,28 +138,29 @@ class _MyAudioHandler extends BaseAudioHandler {
 
   void _notifyAudioHandlerAboutPlaybackEvents() {
     _player.playbackEventStream.listen((PlaybackEvent event) {
-      playbackState.add(playbackState.value.copyWith(
-        controls: [
-          MediaControl.skipToPrevious,
-          if (_player.playing) MediaControl.pause else MediaControl.play,
-          MediaControl.skipToNext,
-        ],
-        androidCompactActionIndices: const [0, 1, 2], // controlsの項目数減らしてみたのでそれに追従
-        systemActions: const {
-          MediaAction.seek,
-        },
-        processingState: const {
-          ProcessingState.idle: AudioProcessingState.idle,
-          ProcessingState.loading: AudioProcessingState.loading,
-          ProcessingState.buffering: AudioProcessingState.buffering,
-          ProcessingState.ready: AudioProcessingState.ready,
-          ProcessingState.completed: AudioProcessingState.completed,
-        }[_player.processingState]!,
-        playing: _player.playing,
-        updatePosition: _player.position,
-        bufferedPosition: _player.bufferedPosition,
-        queueIndex: event.currentIndex,
-      ));
+      playbackState.add(
+        playbackState.value.copyWith(
+          controls: [
+            MediaControl.skipToPrevious,
+            if (_player.playing) MediaControl.pause else MediaControl.play,
+            MediaControl.skipToNext,
+          ],
+          androidCompactActionIndices: const [0, 1, 2], // controlsの項目数減らしてみたのでそれに追従
+          systemActions: const {MediaAction.seek},
+          processingState:
+              const {
+                ProcessingState.idle: AudioProcessingState.idle,
+                ProcessingState.loading: AudioProcessingState.loading,
+                ProcessingState.buffering: AudioProcessingState.buffering,
+                ProcessingState.ready: AudioProcessingState.ready,
+                ProcessingState.completed: AudioProcessingState.completed,
+              }[_player.processingState]!,
+          playing: _player.playing,
+          updatePosition: _player.position,
+          bufferedPosition: _player.bufferedPosition,
+          queueIndex: event.currentIndex,
+        ),
+      );
     });
   }
 

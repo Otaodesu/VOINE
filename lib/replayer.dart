@@ -2,13 +2,11 @@ import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'service.dart' show navigateWavCache;
+import 'voicevox_controller.dart' show navigateWavCache;
 
 // メッセージ再再生関連を一挙に制御するクラスまた作りかえたった！.
 class AudioReplayManager {
-  AudioReplayManager({
-    required this.returnBorrowedMessage,
-  });
+  AudioReplayManager({required this.returnBorrowedMessage});
 
   // 連続再生時の非表示/再表示を「メッセージをこのクラスに貸す/UIに再表示するタイミングで返してもらう」というやり取りで表現してみた
   final Function(types.Message) returnBorrowedMessage; // コールバックで返却する
@@ -38,9 +36,9 @@ class AudioReplayManager {
 
       if (willWait) {
         // 再生完了まで待つ。ここにfirstWhere出てくるのすっごい奇天烈.
-        await _playerObjects[index]
-            .playerStateStream
-            .firstWhere((state) => state.processingState == ProcessingState.completed);
+        await _playerObjects[index].playerStateStream.firstWhere(
+          (state) => state.processingState == ProcessingState.completed,
+        );
       }
     } catch (e) {
       print('キャッチ！🤗$eとのことです。現場からは以上です。');

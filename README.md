@@ -10,7 +10,7 @@
 - 音声合成: [voicevox_flutter](https://github.com/char5742/voicevox_flutter)
 
 ## ライセンスは？
-- ソースコード本体は、flutter_chat_uiにならってApache license 2.0とします。好きに改造しやがれ！
+- ソースコード本体は、本家VOICEVOXにならってLGPL-3.0とします。好きに改造しやがれ！
 - 合成した音声の利用規約は、[こちら](https://voicevox.hiroshiba.jp/)を確認してください。
 - キャラクター名などの権利は、各団体等に帰属します。
 
@@ -20,8 +20,6 @@
 ### 1. 準備するもの
   - [ ] Flutterの開発環境
     -  サンプルアプリ（カウンターのやつ）がビルドできるようにしてください。
-  - [ ] Androidの実機
-    -  arm64ライブラリを使用するため、AndroidStudioに付属するx86_64の仮想マシンでは動作しません（私は気づくのに3日かかりましたが何か？）
 
 ### 2. ダウンロードする
   - [ ] VOINE（このリポジトリ）
@@ -38,9 +36,9 @@
     -  [この時点](https://github.com/VOICEVOX/voicevox_vvm/commit/18ab78fc030bfc7c0fe5e376101613d52cb11ef9)のファイルで動作しました
 
 ### 3. ファイルを配置する
-  - [ ] `open_jtalk_dic_utf_8-1.11` の中身すべてを `voine/assets/open_jtalk_dic_utf_8-1.11` にコピー
+  - [ ] `open_jtalk_dic_utf_8-1.11` の中身すべてを `voine/assets/open_jtalk_dic_utf_8-1.11` にコピーします
 
-  - [ ] `voicevox_vvm-main/vvms` の中身すべてを `voine/assets/model` にコピー
+  - [ ] `voicevox_vvm-main/vvms` の中身すべてを `voine/assets/model` にコピーします
 
 ### 4. voicevox_flutterを紐づける
   - [ ] `voine/pubspec.yaml`を開き、以下の部分を `voicevox_flutter-main` のフォルダパスに書き換えてください
