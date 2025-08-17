@@ -35,7 +35,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }
@@ -85,7 +85,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }
@@ -100,7 +100,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -115,7 +115,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -135,7 +135,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -165,7 +165,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -200,7 +200,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -245,7 +245,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -260,7 +260,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -295,7 +295,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }
@@ -335,7 +335,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }
@@ -350,7 +350,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -380,7 +380,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -410,7 +410,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -435,7 +435,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -450,7 +450,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -475,7 +475,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -490,7 +490,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -520,7 +520,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -535,7 +535,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -550,7 +550,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -565,7 +565,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -580,7 +580,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -603,9 +603,19 @@
         "name": "うきうき",
         "id": 57,
         "type": "talk"
+      },
+      {
+        "name": "つよつよ",
+        "id": 110,
+        "type": "talk"
+      },
+      {
+        "name": "へろへろ",
+        "id": 111,
+        "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -628,9 +638,14 @@
         "name": "人見知り",
         "id": 60,
         "type": "talk"
+      },
+      {
+        "name": "つよつよ",
+        "id": 112,
+        "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -660,7 +675,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }
@@ -675,7 +690,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -690,7 +705,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -725,7 +740,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -740,7 +755,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "ALL"
     }
@@ -755,7 +770,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "NOTHING"
     }
@@ -785,7 +800,7 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }
@@ -820,7 +835,122 @@
         "type": "talk"
       }
     ],
-    "version": "0.15.7",
+    "version": "0.15.9",
+    "supported_features": {
+      "permitted_synthesis_morphing": "SELF_ONLY"
+    }
+  },
+  {
+    "name": "離途",
+    "speaker_uuid": "3b91e034-e028-4acb-a08d-fbdcd207ea63",
+    "styles": [
+      {
+        "name": "ノーマル",
+        "id": 99,
+        "type": "talk"
+      },
+      {
+        "name": "シリアス",
+        "id": 101,
+        "type": "talk"
+      }
+    ],
+    "version": "0.15.9",
+    "supported_features": {
+      "permitted_synthesis_morphing": "ALL"
+    }
+  },
+  {
+    "name": "黒沢冴白",
+    "speaker_uuid": "0b466290-f9b6-4718-8d37-6c0c81e824ac",
+    "styles": [
+      {
+        "name": "ノーマル",
+        "id": 100,
+        "type": "talk"
+      }
+    ],
+    "version": "0.15.9",
+    "supported_features": {
+      "permitted_synthesis_morphing": "ALL"
+    }
+  },
+  {
+    "name": "ユーレイちゃん",
+    "speaker_uuid": "462cd6b4-c088-42b0-b357-3816e24f112e",
+    "styles": [
+      {
+        "name": "ノーマル",
+        "id": 102,
+        "type": "talk"
+      },
+      {
+        "name": "甘々",
+        "id": 103,
+        "type": "talk"
+      },
+      {
+        "name": "哀しみ",
+        "id": 104,
+        "type": "talk"
+      },
+      {
+        "name": "ささやき",
+        "id": 105,
+        "type": "talk"
+      },
+      {
+        "name": "ツクモちゃん",
+        "id": 106,
+        "type": "talk"
+      }
+    ],
+    "version": "0.15.9",
+    "supported_features": {
+      "permitted_synthesis_morphing": "ALL"
+    }
+  },
+  {
+    "name": "東北ずん子",
+    "speaker_uuid": "80802b2d-8c75-4429-978b-515105017010",
+    "styles": [
+      {
+        "name": "ノーマル",
+        "id": 107,
+        "type": "talk"
+      }
+    ],
+    "version": "0.15.9",
+    "supported_features": {
+      "permitted_synthesis_morphing": "SELF_ONLY"
+    }
+  },
+  {
+    "name": "東北きりたん",
+    "speaker_uuid": "1bd6b32b-d650-4072-bbe5-1d0ef4aaa28b",
+    "styles": [
+      {
+        "name": "ノーマル",
+        "id": 108,
+        "type": "talk"
+      }
+    ],
+    "version": "0.15.9",
+    "supported_features": {
+      "permitted_synthesis_morphing": "SELF_ONLY"
+    }
+  },
+  {
+    "name": "東北イタコ",
+    "speaker_uuid": "ab4c31a3-8769-422a-b412-708f5ae637e8",
+    "styles": [
+      {
+        "name": "ノーマル",
+        "id": 109,
+        "type": "talk"
+      }
+    ],
+    "version": "0.15.9",
     "supported_features": {
       "permitted_synthesis_morphing": "SELF_ONLY"
     }

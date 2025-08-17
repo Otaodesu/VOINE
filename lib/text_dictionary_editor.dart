@@ -12,12 +12,7 @@ import 'ui_dialog_classes.dart';
 
 // 辞書編集画面を呼び出す関数.
 void showDictionaryEditPage(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const _TextDictionaryEditPage(),
-    ),
-  );
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const _TextDictionaryEditPage()));
 }
 
 class _TextDictionaryEditPage extends StatefulWidget {
@@ -53,11 +48,12 @@ class _TextDictionaryEditPageState extends State<_TextDictionaryEditPage> {
   void _handleHamburgerPressed() {
     showDialog<String>(
       context: context,
-      builder: (_) => HamburgerMenuForTextDictionary(
-        onExportDictionaryPressed: _showDictionaryExportView,
-        onImportDictionaryPressed: _letsImportDictionary,
-        onDeduplicatePressed: _deduplicateItems,
-      ),
+      builder:
+          (_) => HamburgerMenuForTextDictionary(
+            onExportDictionaryPressed: _showDictionaryExportView,
+            onImportDictionaryPressed: _letsImportDictionary,
+            onDeduplicatePressed: _deduplicateItems,
+          ),
     );
   }
 
@@ -70,11 +66,12 @@ class _TextDictionaryEditPageState extends State<_TextDictionaryEditPage> {
 
     showDialog<String>(
       context: context,
-      builder: (_) => AlternateOfKakidashi(
-        whatYouWantShow: exportingText,
-        whatYouWantSetTitle: 'はいっ、書き出した！🤔',
-        whatWillFileExtensionBe: 'json',
-      ),
+      builder:
+          (_) => AlternateOfKakidashi(
+            whatYouWantShow: exportingText,
+            whatYouWantSetTitle: 'はいっ、書き出した！🤔',
+            whatWillFileExtensionBe: 'json',
+          ),
     );
   }
 
@@ -152,51 +149,36 @@ class _TextDictionaryEditPageState extends State<_TextDictionaryEditPage> {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        theme: ThemeData(
-          colorScheme: const ColorScheme.light(), // なんでAppBar紫やねん！.
-        ),
-        //『【Flutter】Androidでフォントが中華フォントになってしまう問題の原因と解決方法』
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale("ja", "JP"),
-        ],
-        home: Scaffold(
-          appBar: AppBarForTextDictionary(
-            onAddTap: _addNewItem,
-            onHamburgerPress: _handleHamburgerPressed,
-          ),
-          body: Scrollbar(
-            radius: const Radius.circular(10),
-            child: ListView.builder(
-              itemCount: beforeControllers.length,
-              itemBuilder: (context, index) => Row(
+    theme: ThemeData(
+      colorScheme: const ColorScheme.light(), // なんでAppBar紫やねん！.
+    ),
+    //『【Flutter】Androidでフォントが中華フォントになってしまう問題の原因と解決方法』
+    localizationsDelegates: const [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale("ja", "JP")],
+    home: Scaffold(
+      appBar: AppBarForTextDictionary(onAddTap: _addNewItem, onHamburgerPress: _handleHamburgerPressed),
+      body: Scrollbar(
+        radius: const Radius.circular(10),
+        child: ListView.builder(
+          itemCount: beforeControllers.length,
+          itemBuilder:
+              (context, index) => Row(
                 children: [
                   const SizedBox(width: 15), // 画面左端の余白はここ.
-                  Expanded(
-                    child: TextFormField(
-                      controller: beforeControllers[index],
-                    ),
-                  ),
+                  Expanded(child: TextFormField(controller: beforeControllers[index])),
                   const Icon((Icons.navigate_next_rounded)),
-                  Expanded(
-                    child: TextFormField(
-                      controller: afterControllers[index],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => _deleteItem(index),
-                    icon: const Icon(Icons.delete_rounded),
-                  ),
+                  Expanded(child: TextFormField(controller: afterControllers[index])),
+                  IconButton(onPressed: () => _deleteItem(index), icon: const Icon(Icons.delete_rounded)),
                 ],
               ),
-            ),
-          ),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 // あ～あ～関数まで入れちゃって😩.
@@ -257,10 +239,7 @@ class TextDictionaryItem {
   final String after;
 
   // "toJson" は決め打ち！jsonEncode関数がこの名前を探して変換に使うため😧.
-  Map<String, String> toJson() => {
-        'before': before,
-        'after': after,
-      };
+  Map<String, String> toJson() => {'before': before, 'after': after};
 }
 
 class AppBarForTextDictionary extends StatelessWidget implements PreferredSizeWidget {
@@ -278,32 +257,26 @@ class AppBarForTextDictionary extends StatelessWidget implements PreferredSizeWi
 
   @override
   Widget build(BuildContext context) => AppBar(
-        title: const Text('読み方辞書', style: TextStyle(color: Colors.black54)),
-        backgroundColor: Colors.white.withAlpha(230),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
+    title: const Text('読み方辞書', style: TextStyle(color: Colors.black54)),
+    backgroundColor: Colors.white.withAlpha(230),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+    ),
+    actions: [
+      Tooltip(
+        message: '項目を追加する',
+        child: IconButton(
+          // ←←エディターにアイコンのプレビュー出るのヤバくね！？.
+          icon: const Icon(Icons.add_rounded),
+          onPressed: onAddTap,
         ),
-        actions: [
-          Tooltip(
-            message: '項目を追加する',
-            child: IconButton(
-              // ←←エディターにアイコンのプレビュー出るのヤバくね！？.
-              icon: const Icon(Icons.add_rounded),
-              onPressed: onAddTap,
-            ),
-          ),
-          Tooltip(
-            message: '読み方辞書のオプションを表示する',
-            child: IconButton(
-              icon: const Icon(Icons.more_vert_rounded),
-              onPressed: onHamburgerPress,
-            ),
-          ),
-        ],
-      );
+      ),
+      Tooltip(
+        message: '読み方辞書のオプションを表示する',
+        child: IconButton(icon: const Icon(Icons.more_vert_rounded), onPressed: onHamburgerPress),
+      ),
+    ],
+  );
   // SliverAppBar…うーん必要性…まぁええわ😐.
 }
 
@@ -322,30 +295,20 @@ class HamburgerMenuForTextDictionary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SimpleDialog(
-        title: const Text('アクション選択'),
-        surfaceTintColor: Colors.green,
-        children: [
-          SimpleDialogOption(
-            onPressed: onExportDictionaryPressed,
-            child: const ListTile(
-              leading: Icon(Icons.output_rounded),
-              title: Text('辞書を書き出す（.json）'),
-            ),
-          ),
-          SimpleDialogOption(
-            onPressed: onImportDictionaryPressed,
-            child: const ListTile(
-              leading: Icon(Icons.exit_to_app_rounded),
-              title: Text('辞書を読み込む（.json）'),
-            ),
-          ),
-          SimpleDialogOption(
-            onPressed: onDeduplicatePressed,
-            child: const ListTile(
-              leading: Icon(Icons.layers_clear_rounded),
-              title: Text('重複を削除する'),
-            ),
-          ),
-        ],
-      );
+    title: const Text('アクション選択'),
+    children: [
+      SimpleDialogOption(
+        onPressed: onExportDictionaryPressed,
+        child: const ListTile(leading: Icon(Icons.output_rounded), title: Text('辞書を書き出す（.json）')),
+      ),
+      SimpleDialogOption(
+        onPressed: onImportDictionaryPressed,
+        child: const ListTile(leading: Icon(Icons.exit_to_app_rounded), title: Text('辞書を読み込む（.json）')),
+      ),
+      SimpleDialogOption(
+        onPressed: onDeduplicatePressed,
+        child: const ListTile(leading: Icon(Icons.layers_clear_rounded), title: Text('重複を削除する')),
+      ),
+    ],
+  );
 }

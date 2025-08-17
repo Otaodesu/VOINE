@@ -37,22 +37,28 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  path_provider: ^2.1.5
-  shared_preferences: ^2.5.2
-  flutter_rating_bar: ^4.0.1
-  flutter_chat_types: ^3.6.2
-  uuid: ^4.5.1
-  file_picker: ^9.0.2
-  flutter_chat_ui: ^1.6.15
-  fluttertoast: ^8.2.12
-  image_picker: ^1.1.2
-  just_audio: ^0.9.46
   audio_service: ^0.18.17
+  crypto: ^3.0.6
+  cupertino_icons: ^1.0.8
+  file_picker: ^10.3.1
+  flutter_chat_types: ^3.6.2
+  flutter_chat_ui: ^1.6.15
+  flutter_rating_bar: ^4.0.1
+  fluttertoast: ^8.2.12
+  http: ^1.5.0
+  image_picker: ^1.1.2
+  intl: ^0.20.2
+  just_audio: ^0.9.46
+  mime: ^2.0.0
+  open_filex: ^4.7.0
+  path: ^1.9.1
+  path_provider: ^2.1.5
   share_plus: ^10.1.4
+  shared_preferences: ^2.5.2
+  uuid: ^4.5.1
 
   voicevox_flutter:
-    path: ../voicevox_flutter-for_core_0.16.0-preview.0
+    path: ../voicevox_flutter
     # 😆ビルドする前に、voicevox_flutterライブラリのフォルダパスに書き換えてください
 
 dev_dependencies:
@@ -64,7 +70,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

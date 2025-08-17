@@ -56,10 +56,6 @@
            </intent-filter>
         </receiver>
 
-        <!-- Impellerを無効化する。このアプリではなんか重い。TODO: Flutterを更新したら有効化してみる https://docs.flutter.dev/perf/impeller#android -->
-        <meta-data
-            android:name="flutter_use_impeller"
-            android:value="false" />
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

@@ -11,14 +11,17 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:mime/mime.dart';
-// import 'package:open_filex/open_filex.dart'; 2025-03-01 ビルドエラーのため。ライブラリのバグかも
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
-import 'favorability_gauge.dart';
-import 'launch_chrome.dart';
+import 'audio_query_editor/audio_query_editor.dart';
+import 'audio_query_editor/audio_query_type.dart';
+import 'audio_query_editor/entrance_snackbar.dart';
+import 'character_select_sheet/character_select_sheet.dart';
+import 'function.dart';
 import 'replayer.dart';
-import 'synthesizeSerif.dart'; // これで自作のファイルを行き来できるみたい.
+import 'synthesizer/synthesizer.dart'; // これで自作のファイルを行き来できるみたい.
 import 'text_dictionary_editor.dart';
 import 'ui_dialog_classes.dart';
 
@@ -40,6 +43,7 @@ class MyApp extends StatelessWidget {
       GlobalCupertinoLocalizations.delegate,
     ],
     supportedLocales: const [Locale('ja', 'JP')],
+    theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.green)),
     home: const ChatPage(),
   );
 }
@@ -53,17 +57,15 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   List<types.Message> _messages = [];
 
-  List<Widget> _characterSelectButtons = []; // 話者選択ボタンを格納する.
-
   // 誰が投稿するのかはこの変数で決まる.
   var _user = const types.User(
     id: '388f246b-8c41-4ac1-8e2d-5d79f3ff56d9',
     firstName: 'ずんだもん', // デフォルトスピーカー
     lastName: 'ノーマル', // デフォルトスタイル
-    updatedAt: 3, // これがspeakerId😫 スタイル違いも右に表示するにはこれしかなかったんだ…！.
+    updatedAt: 3, // これがstyleId😫 スタイル違いも右に表示するにはこれしかなかったんだ…！.
   );
 
-  final _synthesizerChan = LunarSpecSynthesizer(); // 音声合成を担当するシンセサイザーちゃん爆誕。
+  final _synthesizerChan = Synthesizer(); // 音声合成を担当するシンセサイザーちゃん爆誕。
   late final AudioReplayManager _playerKun; // 再再生を担当するプレーヤーくんは仮設状態。あとで初期化する。
 
   @override
@@ -80,19 +82,25 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this); // didChangeAppLifecycleStateのため
 
-    _loadSpeakerSelectButtons(); // 話者選択ボタンを準備する.
-
     _playerKun = AudioReplayManager(
       returnBorrowedMessage: (types.Message received) {
         print('😂メッセージID: ${received.id}、おかえり…！');
         _addMessage(received);
+
+        // 安易な発想で実装: 左下の入力中の話者のアイコンも自動的に切り替わったら素敵でしょう？
+        if (received.author.imageUrl != null && received.author.id == _user.id) {
+          final updatedUser = (_user).copyWith(imageUrl: received.author.imageUrl);
+          setState(() {
+            _user = updatedUser;
+          });
+        }
       },
     );
 
     _sequentialSynthesizeDaemon(); // Draemonではない.
   }
 
-  // クルクルが表示されているmessageを常時探して音声合成する。
+  // クルクルが表示されているmessageを常時探して見つけ次第音声合成する。
   void _sequentialSynthesizeDaemon() async {
     while (true) {
       // 表示上の上から順に探す。BSはBeforeSynthesize🙄
@@ -163,8 +171,8 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     print('🤖ライフサイクル: $state');
     if (state == AppLifecycleState.inactive) {
-      // 次回起動時に続きから編集（レジューム）できるようにオートセーブする
-      // .pausedや.detachedはタスクマネージャーから終了させたとき発動しなかったので.inactiveにした
+      // 次回起動時につづきから編集（レジューム）できるようにオートセーブする
+      // .pausedや.detachedはタスクビューから終了させたとき発動しなかったので.inactiveにした
       saveMessagesForResume(_messages);
     }
   }
@@ -177,25 +185,17 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
 
   // 画面左下の添付ボタンで動き出す関数.
   void _handleAttachmentPressed() {
-    showModalBottomSheet<void>(
+    showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // これ追加するだけでスクロールし始めた。見直したぜFlutter(カッコがやばい).
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+      isScrollControlled: true,
       builder:
-          (BuildContext context) => SafeArea(
-            child: SizedBox(
-              // SizedBoxで領域を指定してその中全面にSingleChildScrollViewを表示する。よくできてる！(カッコがやばい).
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: Scrollbar(
-                radius: const Radius.circular(10),
-                child: SingleChildScrollView(
-                  // 最上段に突き当たると自動で閉じてほしい欲が出てくる。RefreshIndicatorでpopを発動すればできそう.
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: _characterSelectButtons, // 最終的に表示する中身がこれ。先に準備できている必要がある.
-                  ),
-                ),
-              ),
-            ),
+          (BuildContext context) => CharacterSelectSheet(
+            onAttachPhotoPressed: _handleImageSelection,
+            onAttachFilePressed: _handleFileSelection,
+            onCharacterPressed: (types.User selectedSpeaker) {
+              _handleCharacterSelection(whoAmI: selectedSpeaker);
+            },
           ),
     );
   }
@@ -246,9 +246,66 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       _user = whoAmI;
     });
     print('ユーザーID${_user.id}、話者ID${_user.updatedAt}の姓${_user.firstName}名${_user.lastName}さんになりました');
+  }
 
-    incrementSpeakerUseCount(speakerId: whoAmI.updatedAt ?? -1); // 禍根: ID-1の使用履歴が増えるかも.
-    _loadSpeakerSelectButtons(); // 好感度ゲージを更新するためにリロードする.
+  // AudioQuery編集UIを表示してフィードバックをハンドリングする関数をまとめた関数
+  void _letsStartAudioQueryEditor(String targetMessageId) async {
+    // _messagesから編集対象のAudioQueryを取り出す
+    // TODO: このへんまとめて、message全部とIDいれるとAudioQuery?が返ってくるみたいな無敵の関数つくる
+    final targetMessageIndex = _messages.indexWhere((element) => element.id == targetMessageId);
+    if (targetMessageIndex == -1) {
+      return;
+    }
+
+    late final AudioQuery initialAudioQuery;
+
+    try {
+      final Map<String, dynamic> audioQueryDynamic = _messages[targetMessageIndex].metadata?['query'];
+      initialAudioQuery = AudioQuery.fromJson(audioQueryDynamic);
+    } catch (e) {
+      print('🤗AudioQueryのパースができませんでした！ $e');
+      return;
+    }
+
+    // 編集したAudioQueryを反映する関数を準備しておく
+    void handleFeedbackWhenDisposed(AudioQuery editedAudioQuery) {
+      final feedbackMessageIndex = _messages.indexWhere((element) => element.id == targetMessageId);
+      if (feedbackMessageIndex == -1) {
+        print('🥲反映先のメッセージがなくなってます');
+        return;
+      }
+
+      final updatedMessage = (_messages[feedbackMessageIndex]).copyWith(status: types.Status.sending);
+      updatedMessage.metadata?['query'] = editedAudioQuery.toJson(); // 葛藤: Daemonが認識できるようにMap<String, Dynamic>に戻す
+
+      // ModalBottomSheetが閉じていく最中にsetStateするとぶっ壊れるため待つ
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _messages[feedbackMessageIndex] = updatedMessage;
+        });
+      });
+
+      print('😚AudioQueryが編集できました！やったね！');
+    }
+
+    // 編集UIを表示する関数を準備しておく
+    void showEditSheetByEnum(EditSheetPageEnum initialPageIndex) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder:
+            (BuildContext context) => AudioQueryEditor(
+              initialPageIndex: initialPageIndex,
+              initialAudioQuery: initialAudioQuery,
+              onFeedbackWhenDispose: handleFeedbackWhenDisposed,
+            ),
+      );
+    }
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar(); // いったん表示中のSnackBarを閉じて…
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: EditorEntranceBar(onSnackBarButtonPressed: showEditSheetByEnum), padding: EdgeInsets.all(0)),
+    ); // AudioQuery編集UIへの入口となるSnackBarを表示する
   }
 
   void _handleMessageTap(BuildContext _, types.Message message) async {
@@ -285,23 +342,25 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
           });
         }
       }
-      // await OpenFilex.open(localPath); 2025-03-01 ビルドエラーのため
+      await OpenFilex.open(localPath);
     } else if (message is types.TextMessage) {
       print('ふきだしタップを検出。メッセージIDは${message.id}。再再生してみます！');
+      _letsStartAudioQueryEditor(message.id);
       final isWavStillPlayable = await _playerKun.replayFromMessage(message, false); // 再生してみて成否を取得.
       if (!isWavStillPlayable) {
         if (message.status == types.Status.sending) {
           await Fluttertoast.showToast(msg: 'まだ合成中です🤔');
+        } else {
+          // 再合成するためにsendingのマークをつけてdaemonに見つけてもらう
+          final updatedMessage = (message).copyWith(status: types.Status.sending);
+          final index = _messages.indexWhere(((element) => element.id == message.id));
+          if (index == -1) {
+            return;
+          }
+          setState(() {
+            _messages[index] = updatedMessage;
+          });
         }
-        // 再合成するためにsendingのマークをつけてdaemonに見つけてもらう
-        final updatedMessage = (message).copyWith(status: types.Status.sending);
-        final index = _messages.indexWhere(((element) => element.id == message.id));
-        if (index == -1) {
-          return;
-        }
-        setState(() {
-          _messages[index] = updatedMessage;
-        });
       }
     }
   }
@@ -327,6 +386,7 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
             onSynthesizeAllBelow: () => _synthesizeAllBelow(message.id),
             onMoveMessageUpPressed: () => _moveMessageUp(message.id),
             onMoveMessageDownPressed: () => _moveMessageDown(message.id),
+            onChangeIconPressed: () => _changeIcon(message.id),
           ),
     );
   }
@@ -407,6 +467,24 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     });
   }
 
+  /// メッセージのユーザーアイコンを変更する
+  Future<void> _changeIcon(String messageId) async {
+    final savedImage = await pickUserIcon();
+    if (savedImage == null) {
+      return;
+    }
+
+    final index = _messages.indexWhere((element) => element.id == messageId);
+    if (index == -1) {
+      return;
+    }
+    final updatedUser = (_messages[index].author).copyWith(imageUrl: savedImage.path);
+    final updatedMessage = (_messages[index]).copyWith(author: updatedUser);
+    setState(() {
+      _messages[index] = updatedMessage;
+    });
+  }
+
   void _handlePreviewDataFetched(types.TextMessage message, types.PreviewData previewData) {
     final index = _messages.indexWhere((element) => element.id == message.id);
     final updatedMessage = (_messages[index] as types.TextMessage).copyWith(previewData: previewData);
@@ -463,62 +541,6 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
     });
     // 期待するのは本家VOICEVOXと同じ動作。そんなんわかっとるわい🤧！.
     // でも直近に使ったスタイルをすぐ取り出せるから便利では？ほらほら.
-  }
-
-  // 選択ボタンウィジェットを準備する。好感度ゲージを更新したい場合はここを動かすこと.
-  void _loadSpeakerSelectButtons() async {
-    final textButtons = <TextButton>[];
-    final charactersDictionary = await loadCharactersDictionary();
-
-    // 二重ループでリストにボタンを追加しまくる。これはヤバいでPADの速度じゃありえん.
-    // 起動時にリストを作って準備しておく…ことになった。毎回テイクアウトではコストがかさむため。←今は何言ってるか分かるけども….
-    for (final pickedCharacter in charactersDictionary) {
-      for (final pickedUser in pickedCharacter) {
-        textButtons.add(
-          TextButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('${pickedUser.firstName}（${pickedUser.lastName}）'),
-                Transform.flip(flipX: true, child: await takeoutSpeakerFavorabilityGauge(pickedUser.updatedAt ?? -1)),
-              ],
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              _handleCharacterSelection(whoAmI: pickedUser); // キャラ選択時にはこの関数が動く.
-            },
-          ),
-        );
-      }
-    }
-
-    // もとからあったフォト、ファイル、キャンセルのボタンも追加する.
-    textButtons.add(
-      TextButton(
-        onPressed: () {
-          Navigator.pop(context);
-          _handleImageSelection();
-        },
-        child: const Align(alignment: AlignmentDirectional.centerStart, child: Text('Photo')),
-      ),
-    );
-    textButtons.add(
-      TextButton(
-        onPressed: () {
-          Navigator.pop(context);
-          _handleFileSelection();
-        },
-        child: const Align(alignment: AlignmentDirectional.centerStart, child: Text('File')),
-      ),
-    );
-    textButtons.add(
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Align(alignment: AlignmentDirectional.centerStart, child: Text('Cancel')),
-      ),
-    );
-
-    _characterSelectButtons = textButtons;
   }
 
   // メッセージを空にする.
@@ -619,9 +641,22 @@ class _ChatPageState extends State<ChatPage> with WidgetsBindingObserver {
       onSendPressed: _handleSendPressed,
       showUserAvatars: true,
       showUserNames: true,
+      dateHeaderThreshold: 99999999,
+      groupMessagesThreshold: 999999999,
       user: _user,
-      theme: const DefaultChatTheme(seenIcon: Text('read', style: TextStyle(fontSize: 10.0))),
+      theme: DefaultChatTheme(
+        attachmentButtonMargin: EdgeInsets.fromLTRB(4, 0, 0, 0),
+        attachmentButtonIcon:
+            _user.imageUrl != null
+                ? CircleAvatar(backgroundImage: FileImage(File(_user.imageUrl!)), radius: 24)
+                : Icon(Icons.folder_open_outlined),
+      ),
       l10n: ChatL10nEn(inputPlaceholder: '${_user.firstName}（${_user.lastName}）'),
     ),
   );
 }
+
+// UserAvatar（ユーザーアイコン）を大きくするにはflutter_chat_uiを改造する必要がある😇
+// ステップ1: C:\Users\kiritan\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_chat_ui-1.6.15\lib\src\widgets\message\user_avatar.dart の radius: 16, を書き換える
+// ステップ2: C:\Users\kiritan\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_chat_ui-1.6.15\lib\src\widgets\message\message.dart の SizedBox(width: 40); を書き換える
+// なにかの拍子にもとに戻るのでこの方法は避けたい… でもアイコンはデカくしたいし…

@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:just_audio/just_audio.dart';
 
-import 'voicevox_controller.dart' show navigateWavCache;
+import 'synthesizer/voicevox_controller.dart' show navigateWavCache;
 
 // メッセージ再再生関連を一挙に制御するクラスまた作りかえたった！.
 class AudioReplayManager {
   AudioReplayManager({required this.returnBorrowedMessage});
 
-  // 連続再生時の非表示/再表示を「メッセージをこのクラスに貸す/UIに再表示するタイミングで返してもらう」というやり取りで表現してみた
+  /// 連続再生時のふきだし非表示/再表示を「メッセージをこのクラスに貸す/UIに再表示するタイミングで返してもらう」というやり取りで表現してみた
   final Function(types.Message) returnBorrowedMessage; // コールバックで返却する
   final List<types.Message> _holdingMessages = []; // mainの_messagesと同じ順番、つまり末尾から再生、返却する
 
@@ -32,17 +34,16 @@ class AudioReplayManager {
     final index = _playerObjects.length - 1; // 連打すると位置がずれるので.last.playとかにしない.
     try {
       await _playerObjects[index].setAudioSource(AudioSource.file(wavCache.path));
-      await _playerObjects[index].play();
 
       if (willWait) {
-        // 再生完了まで待つ。ここにfirstWhere出てくるのすっごい奇天烈.
-        await _playerObjects[index].playerStateStream.firstWhere(
-          (state) => state.processingState == ProcessingState.completed,
-        );
+        await _playerObjects[index].play();
+      } else {
+        unawaited(_playerObjects[index].play()); // 再生完了まで待たない。
       }
     } catch (e) {
       print('キャッチ！🤗$eとのことです。現場からは以上です。');
     }
+
     return true;
   }
 

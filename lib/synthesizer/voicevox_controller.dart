@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -17,6 +18,9 @@ class VoicevoxFlutterController {
   // オリチャー: モデルが必要になってからメモリ上に展開する
   final List<String> _loadedModelNames = [];
   late final Map<String, dynamic> _styleIdModelNameMap;
+
+  /// late変数の初期化が完了するまでは足止めしなければならない。Completerを使って通知してみる。アプリ起動後自動で音声合成し始めるのでここにもいる！
+  final _initializationCompleter = Completer();
 
   /// voicevox_flutterを起動する
   Future<void> initialize() async {
@@ -41,10 +45,13 @@ class VoicevoxFlutterController {
     // オリチャーの準備もする
     final modelNameMapAsText = await rootBundle.loadString('assets/styleIdToModelName.json');
     _styleIdModelNameMap = jsonDecode(modelNameMapAsText);
+
+    _initializationCompleter.complete(); // しっかり報告する🫡
   }
 
   /// テキストから AudioQuery を生成する
   Future<String> textToAudioQuery({required String text, required int styleId}) async {
+    await _initializationCompleter.future; // 起動が完了するまで待つ
     await _prepareModel(styleId: styleId);
     final output = await voicevoxFlutter.textToAudioQuery(text: text, styleId: styleId);
     return output;
@@ -52,6 +59,7 @@ class VoicevoxFlutterController {
 
   /// AudioQuery から音声合成する
   Future<File> audioQueryToWav({required String audioQuery, required int styleId}) async {
+    await _initializationCompleter.future;
     await _prepareModel(styleId: styleId);
     final wavFile = File('${(await getTemporaryDirectory()).path}/${audioQuery.hashCode}.wav');
     await voicevoxFlutter.audioQueryToWav(audioQuery: audioQuery, styleId: styleId, output: wavFile);
@@ -60,6 +68,7 @@ class VoicevoxFlutterController {
 
   // 必要なVVMモデルを探してロードする関数。モデルが必要になる前に実行すること
   Future<void> _prepareModel({required int styleId}) async {
+    await _initializationCompleter.future; // 二重になる説あるが一応置いとく
     final requiredModelName = _styleIdModelNameMap[styleId.toString()];
     if (requiredModelName == null) {
       throw Exception('このstyleId: $styleIdに対応するモデル.vvmがどれなのかわかりません😫 assets/styleIdToModelName.jsonを更新してください。');

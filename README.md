@@ -1,5 +1,5 @@
 # VOINE
-- LINE風のチャットUIで、VOICEVOXによる音声合成を試すことができます。
+- VOICEVOXをLINE風のチャットUIで遊ぶアプリです。
 - 完全非公式です。
 - GitHubなるものの練習を兼ねています。
 - noteにて、このアプリの[スクリーンショットを見られます](https://note.com/iseudondes/n/nea9229a4b897)。
@@ -33,7 +33,6 @@
 
   - [ ] VOICEVOX コア音声モデル  
     -  https://github.com/VOICEVOX/voicevox_vvm/tree/main/vvms  
-    -  [この時点](https://github.com/VOICEVOX/voicevox_vvm/commit/18ab78fc030bfc7c0fe5e376101613d52cb11ef9)のファイルで動作しました
 
 ### 3. ファイルを配置する
   - [ ] `open_jtalk_dic_utf_8-1.11` の中身すべてを `voine/assets/open_jtalk_dic_utf_8-1.11` にコピーします
